@@ -64,8 +64,17 @@ public class DrawFunctor {
         try {
             Class canvasClazz;
             Method callDrawGLFunctionMethod;
-
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                canvasClazz = Class.forName("android.view.DisplayListCanvas");
+                try {
+                    callDrawGLFunctionMethod = canvasClazz.getMethod("callDrawGLFunction2", long.class);
+                } catch (NoSuchMethodException e) {
+                    canvasClazz = Class.forName("android.graphics.RecordingCanvas");
+                    callDrawGLFunctionMethod = canvasClazz.getMethod("callDrawGLFunction2", long.class);
+                }
+                callDrawGLFunctionMethod.setAccessible(true);
+                callDrawGLFunctionMethod.invoke(canvas, mNativeFunctor);
+            } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                 canvasClazz = Class.forName("android.view.DisplayListCanvas");
                 callDrawGLFunctionMethod = canvasClazz.getMethod("callDrawGLFunction2", long.class);
                 callDrawGLFunctionMethod.setAccessible(true);
